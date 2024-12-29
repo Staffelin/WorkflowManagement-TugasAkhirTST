@@ -16,7 +16,7 @@
             <form action="<?= base_url('auth/register') ?>" method="post">
                 <div class="form-group">
                     <label for="signup-name">Name</label>
-                    <input id="signup-name" type="text" name="name" placeholder="Enter your name" required class="input">
+                    <input id="signup-name" type="text" name="username" placeholder="Enter your name" required class="input">
                 </div>
                 <div class="form-group">
                     <label for="signup-email">Email</label>

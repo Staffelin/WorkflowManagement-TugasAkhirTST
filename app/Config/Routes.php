@@ -30,10 +30,13 @@ $routes->setAutoRoute(false);
 
 // Authentication Routes
 $routes->group('auth', function ($routes) {
-    $routes->post('login', 'AuthController::login');
-    $routes->post('register', 'AuthController::register');
-    $routes->get('logout', 'AuthController::logout');
+    $routes->get('login', 'UserController::showLogin'); // Display login view
+    $routes->get('register', 'UserController::showRegister'); // Display register view
+    $routes->post('login', 'UserController::login'); // Handle login
+    $routes->post('register', 'UserController::register'); // Handle registration
+    $routes->get('logout', 'UserController::logout'); // Handle logout
 });
+
 
 // Dashboard
 $routes->get('dashboard', 'DashboardController::index');
