@@ -35,24 +35,31 @@ class UserController extends ResourceController
             'email' => 'required|valid_email|is_unique[users.email]',
             'password' => 'required|min_length[6]',
         ];
-
+    
         if (!$this->validate($rules)) {
-            return $this->fail($this->validator->getErrors());
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
         }
-
+    
         $data = [
             'username' => $this->request->getPost('username'),
             'email' => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
             'role' => 'user',
         ];
-
+    
         if ($this->createUser($data)) {
-            return $this->respondCreated($data, 'Registration successful.');
+            // Set user session (optional)
+            $user = $this->model->where('email', $data['email'])->first();
+            session()->set(['user_id' => $user['id'], 'role' => $user['role']]);
+    
+            // Redirect to dashboard
+            return redirect()->to('/dashboard')->with('message', 'Registration successful.');
         }
-
-        return $this->fail('Failed to register user.');
+    
+        // Return error if registration fails
+        return redirect()->back()->with('error', 'Failed to register user.');
     }
+    
 
 
     // Store a new user in the database
@@ -62,16 +69,21 @@ class UserController extends ResourceController
     {
         $email = $this->request->getPost('email');
         $password = $this->request->getPost('password');
-
+    
         $user = $this->model->where('email', $email)->first();
-
+    
         if ($user && password_verify($password, $user['password'])) {
+            // Set user session
             session()->set(['user_id' => $user['id'], 'role' => $user['role']]);
-            return $this->respond(['message' => 'Login successful.'], 200);
+            
+            // Redirect to dashboard
+            return redirect()->to('/dashboard');
         }
-
-        return $this->fail('Invalid login credentials.', 401);
+    
+        // Return error if login fails
+        return redirect()->back()->with('error', 'Invalid login credentials.');
     }
+    
 
     public function logout()
     {

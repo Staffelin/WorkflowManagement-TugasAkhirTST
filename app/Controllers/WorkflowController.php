@@ -13,7 +13,7 @@ class WorkflowController extends ResourceController
 
     public function index()
     {
-        return $this->respond($this->model->findAll(), 200);
+        return view('workflow/index'); // Render the view for the workflow page
     }
 
     public function create()

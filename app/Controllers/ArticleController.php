@@ -12,7 +12,7 @@ class ArticleController extends ResourceController
 
     public function index()
     {
-        return $this->respond($this->model->findAll(), 200);
+        return view('articles/index'); // Render the view for the articles page
     }
 
     public function create()

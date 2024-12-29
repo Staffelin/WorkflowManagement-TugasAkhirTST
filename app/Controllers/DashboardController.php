@@ -2,18 +2,18 @@
 
 namespace App\Controllers;
 
-use App\Models\ArticleModel;
-use CodeIgniter\RESTful\ResourceController;
+use CodeIgniter\Controller;
 
-class DashboardController extends ResourceController
+class DashboardController extends Controller
 {
     public function index()
     {
-        $userId = session()->get('user_id');
-        $articleModel = new ArticleModel();
-        $articles = $articleModel->where('author_id', $userId)->findAll();
+        // Check if user is logged in
+        if (!session()->has('user_id')) {
+            return redirect()->to('/auth/login')->with('error', 'Please log in to access the dashboard.');
+        }
 
-        return $this->respond(['articles' => $articles], 200);
+        // Load dashboard view
+        return view('dashboard');
     }
 }
-?>

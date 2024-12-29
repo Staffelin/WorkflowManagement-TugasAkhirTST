@@ -101,6 +101,11 @@ $routes->group('settings', function ($routes) {
     $routes->post('update/(:num)', 'SettingsController::update/$1');
 });
 
+$routes->get('/articles', 'ArticlesController::index');
+$routes->get('/workflow', 'WorkflowController::index');
+$routes->get('/approval', 'ApprovalController::index');
+
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing
