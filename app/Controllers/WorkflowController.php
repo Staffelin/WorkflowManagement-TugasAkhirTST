@@ -13,7 +13,10 @@ class WorkflowController extends ResourceController
 
     public function index()
     {
-        return view('workflow/index'); // Render the view for the workflow page
+        $workflowModel = new WorkflowModel();
+        $workflows = $workflowModel->findAll(); // Fetch all workflows
+
+        return view('workflow/index', ['workflows' => $workflows]);
     }
 
     public function create()
