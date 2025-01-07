@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    image: php:8.3-fpm
+    container_name: codeigniter_app
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DB: finalproyektst
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: raihan
+    command: >
+      sh -c "composer install &&
+             php spark serve --host=0.0.0.0 --port=80"
+
+  db:
+    image: postgres:latest
+    container_name: codeigniter_db
+    environment:
+      POSTGRES_DB: finalproyektst
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: raihan
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  node:
+    image: node:18
+    container_name: codeigniter_node
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    command: >
+      sh -c "npm install &&
+             npx tailwindcss build ./resources/css/input.css -o ./public/css/output.css"
+
+volumes:
+  postgres_data:

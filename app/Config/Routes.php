@@ -15,8 +15,8 @@ if (file_exists(SYSTEMPATH . 'Config/Routes.php')) {
  * --------------------------------------------------------------------
  */
 $routes->setDefaultNamespace('App\Controllers');
-$routes->setDefaultController('DashboardController');
-$routes->setDefaultMethod('index');
+$routes->setDefaultController('UserController'); // Set UserController as the default controller
+$routes->setDefaultMethod('showLogin'); // Set the default method to showLogin
 $routes->setTranslateURIDashes(false);
 $routes->set404Override();
 $routes->setAutoRoute(false);
@@ -26,6 +26,15 @@ $routes->setAutoRoute(false);
  * Route Definitions
  * --------------------------------------------------------------------
  */
+
+// Redirect root URL to auth/login
+$routes->get('/', 'UserController::showLogin');
+
+// Debugging: Clear session route
+$routes->get('/clear-session', function () {
+    session()->destroy();
+    return 'Session cleared.';
+});
 
 // Authentication Routes
 $routes->group('auth', function ($routes) {
@@ -37,44 +46,23 @@ $routes->group('auth', function ($routes) {
 });
 
 // Dashboard Route
-$routes->get('dashboard', 'DashboardController::index');
+$routes->get('dashboard', 'DashboardController::index', ['filter' => 'auth']);
 
 // Articles Routes (using ResourceController)
 $routes->resource('articles', [
     'controller' => 'ArticleController',
+    'filter' => 'auth',
 ]);
 
 // Workflows Routes (using ResourceController)
 $routes->resource('workflows', [
     'controller' => 'WorkflowController',
+    'filter' => 'auth',
 ]);
 
-// Tasks Routes
-$routes->group('tasks', function ($routes) {
-    $routes->get('/', 'TaskController::index');
-    $routes->get('create', 'TaskController::create');
-    $routes->post('store', 'TaskController::store');
-    $routes->get('edit/(:num)', 'TaskController::edit/$1');
-    $routes->post('update/(:num)', 'TaskController::update/$1');
-    $routes->post('delete/(:num)', 'TaskController::delete/$1');
-    $routes->get('(:num)', 'TaskController::show/$1');
-});
-
-// Approvals Routes
-$routes->group('approvals', function ($routes) {
-    $routes->get('/', 'ApprovalController::index');
-    $routes->get('create', 'ApprovalController::create');
-    $routes->post('store', 'ApprovalController::store');
-    $routes->get('edit/(:num)', 'ApprovalController::edit/$1');
-    $routes->post('update/(:num)', 'ApprovalController::update/$1');
-    $routes->get('(:num)', 'ApprovalController::show/$1');
-});
-
-// Settings Routes
-$routes->group('settings', function ($routes) {
-    $routes->get('/', 'SettingsController::index');
-    $routes->post('update/(:num)', 'SettingsController::update/$1');
-});
+// Profile Page Routes
+$routes->get('/profile', 'UserController::profile', ['filter' => 'auth']);
+$routes->post('/profile/update', 'UserController::updateProfile', ['filter' => 'auth']);
 
 /*
  * --------------------------------------------------------------------

@@ -18,8 +18,18 @@ class UserController extends ResourceController
     // Show login view
     public function showLogin()
     {
-        return view('auth/login'); // Assumes a view file exists at app/Views/auth/login.php
+        // Log session data for debugging
+        log_message('info', 'Session Data: ' . json_encode(session()->get()));
+    
+        if (session()->get('user_id')) {
+            // Redirect to dashboard if already logged in
+            return redirect()->to('/dashboard');
+        }
+    
+        return view('auth/login');
     }
+    
+    
 
     // Show register view
     public function showRegister()
@@ -59,9 +69,59 @@ class UserController extends ResourceController
         // Return error if registration fails
         return redirect()->back()->with('error', 'Failed to register user.');
     }
+
+    public function profile()
+    {
+        // Check if the user is logged in
+        if (!session()->get('user_id')) {
+            // Redirect to login page if not authenticated
+            return redirect()->to('/auth/login')->with('error', 'You must be logged in to access the profile page.');
+        }
     
+        // Get the logged-in user ID from the session
+        $userId = session()->get('user_id');
+    
+        // Fetch the user's data from the database
+        $user = $this->model->find($userId);
+    
+        if (!$user) {
+            return redirect()->to('/auth/login')->with('error', 'User data not found.');
+        }
+    
+        // Return the profile view with the user data
+        return view('profiles', ['user' => $user]);
+    }
+        
 
+    public function updateProfile()
+    {
+        $userId = session()->get('user_id');
+        $user = $this->model->find($userId);
 
+        if (!$user) {
+            return redirect()->to('/login')->with('error', 'You must be logged in to update the profile.');
+        }
+
+        $rules = [
+            'username' => 'required|min_length[3]|max_length[100]',
+            'email' => 'required|valid_email|is_unique[users.email,id,{id}]', // Ensures email is unique except for the current user
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        $data = [
+            'username' => $this->request->getPost('username'),
+            'email' => $this->request->getPost('email'),
+        ];
+
+        if ($this->model->update($userId, $data)) {
+            return redirect()->to('/profile')->with('message', 'Profile updated successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Failed to update profile.');
+    } 
     // Store a new user in the database
     
 
