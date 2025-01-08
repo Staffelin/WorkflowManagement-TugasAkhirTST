@@ -11,27 +11,28 @@ class WorkflowController extends ResourceController
     protected $format = 'json';
 
     public function index()
-{
-    log_message('info', 'WorkflowController index method called.');
+    {
+        log_message('info', 'WorkflowController index method called.');
 
-    $workflowModel = new WorkflowModel();
-    $workflows = $workflowModel->findAll(); // Fetch all workflows
+        $workflowModel = new WorkflowModel();
+        $workflows = $workflowModel->findAll(); // Fetch all workflows
 
-    return view('workflow/index', ['workflows' => $workflows]);
-}
+        return view('workflow/index', ['workflows' => $workflows]);
+    }
 
 
     public function updateStatus($id = null)
     {
         // Log request data for debugging
-        log_message('info', 'Received updateStatus request: ' . json_encode($this->request->getPost()));
+        log_message('info', 'Received updateStatus request: ' . json_encode($this->request->getJSON()));
 
         $workflow = $this->model->find($id);
         if (!$workflow) {
             return $this->failNotFound('Workflow not found.');
         }
 
-        $newStatus = $this->request->getPost('status');
+        $input = $this->request->getJSON();
+        $newStatus = $input->status ?? null;
         $validStatuses = ['To Do', 'In Progress', 'In Evaluation', 'Finished'];
 
         if (!in_array($newStatus, $validStatuses)) {
@@ -45,6 +46,7 @@ class WorkflowController extends ResourceController
 
         return $this->fail('Failed to update status.');
     }
+
 
     // Temporary test method for debugging
     public function testUpdateStatus($id)

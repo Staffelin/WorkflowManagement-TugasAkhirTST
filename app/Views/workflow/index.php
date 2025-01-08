@@ -42,7 +42,45 @@
         <?php } ?>
     </div>
 
+    <!-- Dropdown Form for Task Update -->
+    <div class="max-w-xl mx-auto bg-white mt-8 p-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-4 text-center">Update Workflow Status</h2>
+        <form id="workflow-form">
+            <!-- Task Dropdown -->
+            <div class="mb-4">
+                <label for="task" class="block font-bold mb-2">Select Task:</label>
+                <select id="task" name="task" class="w-full border rounded px-3 py-2">
+                    <option value="">-- Select a Task --</option>
+                    <?php foreach ($workflows as $workflow): ?>
+                        <option value="<?= $workflow['id'] ?>">
+                            <?= htmlspecialchars($workflow['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <!-- Status Dropdown -->
+            <div class="mb-4">
+                <label for="status" class="block font-bold mb-2">Select Status:</label>
+                <select id="status" name="status" class="w-full border rounded px-3 py-2">
+                    <option value="">-- Select a Status --</option>
+                    <?php
+                    foreach ($statuses as $status):
+                    ?>
+                        <option value="<?= $status ?>"><?= $status ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <!-- Save Button -->
+            <button type="button" id="save-button" class="w-full bg-blue-500 text-white font-bold rounded px-3 py-2 hover:bg-blue-600">
+                Save
+            </button>
+        </form>
+    </div>
+
     <script>
+        // Kanban Board Logic
         const statuses = <?= json_encode(array_map(fn($status) => strtolower(str_replace(' ', '-', $status)), $statuses)) ?>;
         statuses.forEach(status => {
             const column = document.getElementById(status);
@@ -63,6 +101,36 @@
                         }
                     });
                 }
+            });
+        });
+
+        // Dropdown Form Logic
+        document.getElementById('save-button').addEventListener('click', function () {
+            const taskId = document.getElementById('task').value;
+            const newStatus = document.getElementById('status').value;
+
+            if (!taskId || !newStatus) {
+                alert('Please select both a task and a status.');
+                return;
+            }
+
+            fetch(`/workflow/updateStatus/${taskId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    const errorDetails = await response.json();
+                    alert(`Failed to update status: ${errorDetails.message || 'Unknown error'}`);
+                } else {
+                    alert('Task status updated successfully!');
+                    window.location.reload(); // Refresh the page
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
             });
         });
     </script>

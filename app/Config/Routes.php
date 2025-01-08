@@ -60,6 +60,9 @@ $routes->resource('workflows', [
     'filter' => 'auth',
 ]);
 
+// Custom Route for Updating Status
+$routes->post('workflow/updateStatus/(:num)', 'WorkflowController::updateStatus/$1', ['filter' => 'auth']);
+
 // Profile Page Routes
 $routes->get('/profile', 'UserController::profile', ['filter' => 'auth']);
 $routes->post('/profile/update', 'UserController::updateProfile', ['filter' => 'auth']);
