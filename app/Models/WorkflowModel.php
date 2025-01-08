@@ -8,6 +8,15 @@ class WorkflowModel extends Model
 {
     protected $table = 'workflows';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['name', 'description', 'created_by', 'status', 'assigned_user_ids', 'created_at', 'updated_at'];
-    protected $useTimestamps = true;
+    protected $allowedFields = [
+        'name',
+        'description',
+        'status',
+        'article_id',
+        'user_id',
+        'created_by',
+        'created_at',
+        'updated_at'
+    ];
+        protected $useTimestamps = true;
 }
