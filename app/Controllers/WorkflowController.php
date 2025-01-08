@@ -100,4 +100,26 @@ class WorkflowController extends ResourceController
         log_message('error', 'Failed to insert workflow into database.');
         return $this->fail('Failed to create workflow.');
     }
+
+    public function delete($id = null)
+    {
+        if (!$id) {
+            return $this->fail('No workflow ID provided.');
+        }
+    
+        // Check if the workflow exists
+        $workflow = $this->model->find($id);
+        if (!$workflow) {
+            return $this->failNotFound('Workflow not found.');
+        }
+    
+        // Attempt to delete the workflow
+        if ($this->model->delete($id)) {
+            return $this->respondDeleted(['message' => 'Workflow deleted successfully.']);
+        }
+    
+        return $this->fail('Failed to delete the workflow.');
+    }
+    
+
 }
