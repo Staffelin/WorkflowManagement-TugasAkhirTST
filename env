@@ -30,7 +30,7 @@ app.baseURL = 'http://localhost:8080/'
 # DATABASE
 #--------------------------------------------------------------------
 
-database.default.hostname = localhost
+database.default.hostname = db
 database.default.database = finalproyektst
 database.default.username = postgres
 database.default.password = raihan
