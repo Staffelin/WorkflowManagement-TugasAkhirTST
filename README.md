@@ -1,68 +1,136 @@
-# CodeIgniter 4 Application Starter
+# **Panduan menjalankan service secara lokal menggunakan Docker**
 
-## What is CodeIgniter?
+## **Requirements**
+Pastikan tools ini ada di sistem:
+- Docker
+- Docker Compose
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+### 1. **Clone repo ini**
+```bash
+git clone <repository-url>
+cd <repository-name>
+```
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+---
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+### **2. Configure Environment Variables**
+Update the `.env` file with your database and application configurations. Example `.env` file:
+```plaintext
+CI_ENVIRONMENT = development
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+# Database Configuration
+database.default.hostname = db
+database.default.database = finalproyektst
+database.default.username = postgres
+database.default.password = raihan
+database.default.DBDriver = Postgre
+database.default.port = 5432
+```
 
-## Installation & updates
+---
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+### **3. Build and Start the Docker Containers**
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+Run the following commands to build and start the Docker containers:
+```bash
+docker-compose up --build -d
+```
 
-## Setup
+This command:
+- Builds the application container.
+- Starts the containers for the app and PostgreSQL database.
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+---
 
-## Important Change with index.php
+### **4. Run Database Migrations**
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+To ensure the database schema is up-to-date, run the following commands:
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+1. Access the app container:
+   ```bash
+   docker exec -it codeigniter_app sh
+   ```
 
-**Please** read the user guide for a better explanation of how CI4 works!
+2. Run migrations:
+   ```bash
+   php spark migrate
+   ```
 
-## Repository Management
+3. Exit the container:
+   ```bash
+   exit
+   ```
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+---
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+### **5. Access the Application**
 
-## Server Requirements
+After the containers are up and running:
+- Open your browser and navigate to: [http://localhost:8080](http://localhost:8080)
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+---
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+## **Project Structure**
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+```plaintext
+.
+├── app/                    # CodeIgniter application folder
+├── public/                 # Publicly accessible files
+├── writable/               # Writable files (logs, cache, etc.)
+├── .env                    # Environment configuration
+├── Dockerfile              # Docker image configuration
+├── docker-compose.yaml     # Docker Compose configuration
+└── README.md               # Project documentation
+```
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+---
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+## **Stopping the Containers**
+
+To stop the containers, run:
+```bash
+docker-compose down
+```
+
+This will stop and remove the containers.
+
+---
+
+## **Additional Commands**
+
+### **Rebuilding the Containers**
+If you make changes to the Dockerfile or `docker-compose.yaml`, rebuild the containers:
+```bash
+docker-compose up --build -d
+```
+
+### **Viewing Logs**
+To view the logs of the app container:
+```bash
+docker-compose logs app
+```
+
+To view the logs of the database container:
+```bash
+docker-compose logs db
+```
+
+---
+
+## **Troubleshooting**
+
+1. **Database Connection Issues**:
+   - Ensure the database service name (`db`) in the `.env` file matches the `docker-compose.yaml`.
+   - Verify the database is running:
+     ```bash
+     docker-compose ps
+     ```
+
+2. **Clearing Cache**:
+   If the application behaves unexpectedly after changes:
+   ```bash
+   docker exec -it codeigniter_app sh
+   php spark cache:clear
+   ```
+
+---

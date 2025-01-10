@@ -40,6 +40,13 @@
             </button>
         </form>
     </div>
+    <div class="p-6 text-center">
+        <form action="<?= base_url('/logout') ?>" method="post" class="inline">
+            <button type="submit" class="w-full px-4 py-2 bg-red-500 text-white font-medium rounded-md hover:bg-red-600 focus:outline-none">
+                Logout
+            </button>
+        </form>
+    </div>
     <div class="p-6 text-center text-sm text-gray-500">
         Your information is securely stored and never shared.
     </div>
